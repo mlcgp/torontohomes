@@ -54,4 +54,4 @@ secret.py
 
 # Other
 chromedriver
-*.DS_Store
+.DS_Store
