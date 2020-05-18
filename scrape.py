@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -39,13 +39,16 @@ time.sleep(2)
 def spider():
     num_pages = int(driver.find_element_by_css_selector("body.home.gallery.logged-in:nth-child(2) div.wrapper:nth-child(1) main.transition-after-load.gut section.supplementary-nav.xs-mt5.xs-mb6.sm-mt5.sm-mb6.xs-flex.xs-flex-column.xs-flex-align-center:nth-child(3) nav.md-inline-block.xs-hide.md-block > a.button.button--mono.button--large.shadow-1.xs-mr05:nth-child(7)").text)
     # Iterate through all pages for search results (base_url)
+    all_data = []
     for i in range(num_pages - 1):
         num_listings = list(range(1, len(driver.find_elements_by_class_name("street"))+1))
         listings = [
             f"//li[{num_listing}]//article[1]//div[1]//div[1]//a[1]//h3[1]" for num_listing in num_listings]
-        all_data = []
         for listing in listings:
-            driver.find_element_by_xpath(listing).click()
+            try:
+                driver.find_element_by_xpath(listing).click()
+            except NoSuchElementException:
+                continue
             # Avoid 404 errors
             try:
                 r = requests.head(driver.current_url)
@@ -69,7 +72,11 @@ def spider():
             time.sleep(2)
             soup = BeautifulSoup(driver.page_source, 'lxml')
             # Get the listing data
-            listing_data = get_data(soup, driver)
+            try:
+                listing_data = get_data(soup, driver)
+            except IndexError:
+                driver.back()
+                continue
             all_data.append(listing_data)
             driver.back()
             # Go to the next page if at the last item of listings

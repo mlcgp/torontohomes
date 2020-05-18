@@ -5,7 +5,8 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def get_data(soup, driver):
 
-    # Get top page listing data.
+    # Get top page listing data and add exception is item is not found
+
     address = soup.select(
         "#listing > div > div > section.listing-summary-grid.xs-mt2.xs-mb3.md-mt3 > section.listing-location.xs-flex-order-1.min-width-0 > h1")[0].get_text()
     city = soup.select(
