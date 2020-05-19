@@ -55,3 +55,4 @@ secret.py
 # Other
 chromedriver
 .DS_Store
+.ipynb_checkpoints
