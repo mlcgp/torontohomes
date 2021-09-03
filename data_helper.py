@@ -92,3 +92,4 @@ def get_data(soup, driver):
 
     pp.pprint(_dict)
     return _dict
+
